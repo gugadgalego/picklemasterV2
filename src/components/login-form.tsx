@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { EyeIcon, EyeSlashIcon } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -23,12 +24,22 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [showPassword, setShowPassword] = React.useState(false)
+  const router = useRouter()
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const data = new FormData(event.currentTarget)
+    const email = String(data.get("email") ?? "").trim()
+    const password = String(data.get("password") ?? "")
+    if (!email || !password) return
+    router.push("/dashboard")
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid min-h-[600px] p-0 md:grid-cols-2">
-          <form className="flex flex-col justify-center p-6 md:p-10">
+          <form onSubmit={handleSubmit} className="flex flex-col justify-center p-6 md:p-10">
             <FieldGroup className="mx-auto w-full max-w-sm gap-6">
               <div className="flex flex-col gap-2 text-center">
                 <h1 className="text-3xl font-semibold tracking-tight">Bem-vindo de volta</h1>
@@ -46,13 +57,14 @@ export function LoginForm({
 
               <div className="grid gap-3">
                 <Field>
-                  <Input id="email" type="email" placeholder="Email" required />
+                  <Input id="email" name="email" type="email" placeholder="Email" required />
                 </Field>
 
                 <Field>
                   <InputGroup>
                     <InputGroupInput
                       id="password"
+                      name="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="Senha"
                       required
